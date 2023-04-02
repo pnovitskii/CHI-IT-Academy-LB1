@@ -5,8 +5,10 @@
 #include <string>
 
 l1::Txt::Txt() {
-	data = nullptr;
+	data = NULL;
+	size_ = 0;
 }
+
 l1::Txt::Txt(const char* fileName)
 {
 	std::ifstream file(fileName);
@@ -17,7 +19,7 @@ l1::Txt::Txt(const char* fileName)
 		while (std::getline(file, line)) {
 			count++;
 		}
-		length = count;
+		size_ = count;
 
 		data = new std::string[count];
 
@@ -30,48 +32,54 @@ l1::Txt::Txt(const char* fileName)
 		file.close();
 	}
 }
+
 l1::Txt::~Txt() {
 	delete[] data;
 }
-size_t l1::Txt::size()
+
+size_t l1::Txt::size() const
 {
-	return length;
+	return size_;
 }
-l1::Txt::Txt(Txt& obj) {
-	data = new std::string[obj.length];//obj.data;
-	length = obj.length;
-	for (int i = 0; i < length; i++) {
-		data[i] = obj.data[i];
+
+l1::Txt::Txt(const Txt& obj) {
+	if (obj.size_ <= 0) {
+		throw std::invalid_argument("Invalid size_ for Txt object");
 	}
+	data = new std::string[obj.size_];
+	size_ = obj.size_;
+	std::copy(obj.data, obj.data + size_, this->data);
+	/*for (int i = 0; i < size_; i++) {
+		data[i] = obj.data[i];
+	}*/
 }
+
 l1::Txt& l1::Txt::operator=(Txt& obj)
 {
 	if (this != &obj) {
-		data = obj.data;
-		length = obj.length;
+		
+		size_ = obj.size_;
+		data = new std::string[size_];
+		std::copy(obj.data, obj.data + size_, data);
 	}
 	return *this;
 }
+
 l1::Txt& l1::Txt::operator=(Txt&& obj)
 {
-	if (this != &obj) {
-		delete[] data;
-		data = obj.data;
-		length = obj.length;
-		obj.data = nullptr;
-		obj.length = 0;
-	}
+	delete[] data;
+	data = std::move(obj.data);
+	size_ = obj.size_;
+	obj.data = nullptr;
+	obj.size_ = 0;
+	
 	return *this;
 }
-l1::Txt::Txt(Txt&& obj) noexcept
+
+l1::Txt::Txt(Txt&& obj)
 {
 	data = obj.data;
 	obj.data = nullptr;
-	length = obj.length;
+	size_ = obj.size_;
+	obj.size_ = 0;
 }
-
-
-
-
-
-
