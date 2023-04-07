@@ -5,7 +5,7 @@
 #include <string>
 
 l1::Txt::Txt() {
-	data = NULL;
+	data = nullptr;
 	size_ = 0;
 }
 
@@ -27,7 +27,7 @@ l1::Txt::Txt(const char* fileName)
 		file.seekg(0, std::ios::beg);
 		for (int i = 0; i < count; i++) {
 			std::getline(file, line);
-			data[i] = line;
+			data[i] = std::move(line);
 		}
 		file.close();
 	}
@@ -43,21 +43,14 @@ size_t l1::Txt::size() const
 }
 
 l1::Txt::Txt(const Txt& obj) {
-	if (obj.size_ <= 0) {
-		throw std::invalid_argument("Invalid size_ for Txt object");
-	}
 	data = new std::string[obj.size_];
 	size_ = obj.size_;
 	std::copy(obj.data, obj.data + size_, this->data);
-	/*for (int i = 0; i < size_; i++) {
-		data[i] = obj.data[i];
-	}*/
 }
 
 l1::Txt& l1::Txt::operator=(Txt& obj)
 {
 	if (this != &obj) {
-		
 		size_ = obj.size_;
 		data = new std::string[size_];
 		std::copy(obj.data, obj.data + size_, data);
